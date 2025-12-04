@@ -57,18 +57,20 @@ jobs:
       # --name: The output filename
       # --hidden-import: Explicitly help PyInstaller find libraries
       - name: Build with PyInstaller
+        shell: bash
         run: |
           pyinstaller --clean --onefile --windowed --name xTerm \
             --hidden-import=paramiko --hidden-import=pyte --hidden-import=tkinter \
             main.py
 
-      # OS Specific Renaming/Packaging
-      
-      # WINDOWS: It adds .exe automatically, we just verify it exists
+      # FIX: 'shell: bash' added here to use standard 'mv' command on Windows
       - name: Check Windows Build
         if: runner.os == 'Windows'
+        shell: bash
         run: |
-          if (Test-Path "dist/xTerm.exe") { Move-Item "dist/xTerm.exe" "dist/${{ matrix.artifact_name }}" }
+          if [ -f "dist/xTerm.exe" ]; then
+            mv "dist/xTerm.exe" "dist/${{ matrix.artifact_name }}"
+          fi
 
       # LINUX: Rename the binary
       - name: Check Linux Build
